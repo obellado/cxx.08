@@ -17,11 +17,26 @@ class Span {
 		Span & operator=(const Span & copy);
 
 		void addNumber(int number);
+		template<typename T>
+		void addNumber(T begin, T end) {
+			if (this->_it + std::distance(begin, end) > this->getN())
+				throw NoAddPacket();
+			std::vector<int>::const_iterator it;
+			it = this->_vector.begin() + this->getIt();
+			this->_vector.insert(it, begin, end);
+			this->_vector.resize(this->getN());
+			this->_it += std::distance(begin, end);
+		}
 		unsigned int getN() const;
 		unsigned int getIt() const;
 		std::vector<int> getVector() const;
 
 		class NoAdd: public std::exception {
+			public:
+				virtual const char *what() const throw();
+		};
+
+		class NoAddPacket: public std::exception {
 			public:
 				virtual const char *what() const throw();
 		};

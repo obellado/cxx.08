@@ -33,11 +33,16 @@ unsigned int Span::getN() const { return (this->_n); }
 
 unsigned int Span::getIt() const { return (this->_it); }
 
-std::vector<int> Span::getVector() const { return (this->_vector); }
+std::vector<int>  Span::getVector() const { return (this->_vector); }
 
 const char* Span::NoAdd::what() const throw()
 {
 	return ("Span is totally FULL");
+}
+
+const char* Span::NoAddPacket::what() const throw()
+{
+	return ("No enough space in this Span");
 }
 
 const char* Span::NoSpan::what() const throw()
@@ -46,15 +51,16 @@ const char* Span::NoSpan::what() const throw()
 }
 
 unsigned int Span::shortestSpan() const {
+	if (this->getIt() <= 2)
+		throw NoSpan();
 	std::vector<int> V = this->_vector;
-	std::sort(V.begin(), V.end());
+	std::sort(V.begin(), V.begin() + this->getIt());
 	std::vector<int>::const_iterator it;
 	it = V.begin();
-	int prev = *(it++);
-	int diff = *(it) - prev;
-	int min = diff;
-	std::cout << prev << " " << diff << " " << min << std::endl;
-    for (it = ++V.begin(); it != V.end(); ++it){
+	unsigned int prev = *(it++);
+	unsigned int min = *(it) - prev;
+	unsigned int diff = min;
+    for (it = ++V.begin(); it != V.begin() + this->getIt(); ++it){
 		diff = (*it) - prev;
 		min = std::min(min, diff);
         prev = *it;
@@ -63,11 +69,13 @@ unsigned int Span::shortestSpan() const {
 }
 
 unsigned int Span::longestSpan() const {
+	if (this->getIt() <= 2)
+		throw NoSpan();
 	unsigned int diff = 0;
 	std::vector<int>::const_iterator it;
-	it = max_element(this->_vector.begin(), this->_vector.end());
+	it = max_element(this->_vector.begin(), this->_vector.begin() + this->getIt());
 	diff = this->_vector[distance(this->_vector.begin(), it)];
-	it = min_element(this->_vector.begin(), this->_vector.end());
+	it = min_element(this->_vector.begin(), this->_vector.begin() + this->getIt());
 	diff -= this->_vector[distance(this->_vector.begin(), it)];
 	return (diff);
 }
